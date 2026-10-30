@@ -1,0 +1,27 @@
+<view class="root {{themeClass}}">
+
+  <view class="card" wx:if="{{!groups.length}}">
+    <view class="empty">
+      <image src="/images/ic-pen.png" mode="aspectFit" />
+      <view class="empty-title">还没有笔记</view>
+      <view class="empty-sub">在详情页点击正文段落即可添加批注</view>
+    </view>
+  </view>
+
+  <view class="card ng-card" wx:for="{{groups}}" wx:key="id">
+    <view class="ng-title" data-id="{{item.id}}" bindtap="onDocTap">{{item.title}}</view>
+    <view
+      class="note-item color-{{m.color}}"
+      wx:for="{{item.list}}"
+      wx:for-item="m"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onDocTap"
+    >
+      <view class="note-quote">{{m.excerpt}}</view>
+      <view class="note-text" wx:if="{{m.note}}">{{m.note}}</view>
+      <view class="note-doc">{{m.timeText}}</view>
+    </view>
+  </view>
+
+</view>

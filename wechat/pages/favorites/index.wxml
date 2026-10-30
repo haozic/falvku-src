@@ -1,0 +1,26 @@
+<view class="root {{themeClass}}">
+
+  <view class="card" wx:if="{{!list.length}}">
+    <view class="empty">
+      <image src="/images/ic-star.png" mode="aspectFit" />
+      <view class="empty-title">还没有收藏</view>
+      <view class="empty-sub">在详情页点「收藏」即可加入</view>
+    </view>
+  </view>
+
+  <view class="doc-item" wx:for="{{list}}" wx:key="id">
+    <view class="di-top" data-id="{{item.id}}" bindtap="onDocTap">
+      <view class="doc-title">{{item.title}}</view>
+      <view class="doc-meta">
+        <text class="badge badge-accent" wx:if="{{item.catName}}">{{item.catName}}</text>
+        <text class="meta-txt" wx:if="{{item.published}}">{{item.publishedText}}</text>
+        <text class="meta-txt" wx:if="{{item.issuer}}">{{item.issuer}}</text>
+      </view>
+    </view>
+    <view class="di-actions">
+      <view class="btn btn-danger btn-sm" data-id="{{item.id}}" bindtap="onRemove">取消收藏</view>
+      <text class="di-time">收藏于 {{item.timeText}}</text>
+    </view>
+  </view>
+
+</view>

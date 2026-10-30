@@ -1,0 +1,213 @@
+<view class="root {{themeClass}}">
+
+  <!-- 加载中 -->
+  <view class="card" wx:if="{{loading}}">
+    <view class="skeleton"></view>
+    <view class="skeleton"></view>
+  </view>
+
+  <!-- 加载失败 -->
+  <view class="card" wx:if="{{error}}">
+    <view class="empty">
+      <image src="/images/ic-none.png" mode="aspectFit" />
+      <view class="empty-title">无法打开该法规</view>
+      <view class="empty-sub">{{error}}</view>
+    </view>
+  </view>
+
+  <block wx:if="{{!loading && !error}}">
+
+    <!-- 标题 + 元信息 -->
+    <view class="card hero">
+      <view class="hero-title">{{doc.title}}</view>
+      <view class="hero-tags">
+        <text class="badge badge-accent">{{doc.catName}}</text>
+        <text class="badge" wx:if="{{doc.group}}">{{doc.group}}</text>
+        <text class="badge badge-ok" wx:if="{{doc.effect}}">{{doc.effect}}</text>
+        <text class="badge" wx:if="{{doc.flxz}}">{{doc.flxz}}</text>
+        <text class="badge" wx:for="{{tags}}" wx:key="*this">{{item}}</text>
+      </view>
+      <view class="meta-grid">
+        <view class="meta-cell" wx:for="{{metaRows}}" wx:key="k">
+          <text class="mk">{{item.k}}</text>
+          <text class="mv">{{item.v}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 摘要 -->
+    <view class="card summary" wx:if="{{doc.summary}}">
+      <view class="sum-title">摘要</view>
+      <rich-text class="sum-text" nodes="{{summaryHtml}}"></rich-text>
+    </view>
+
+    <!-- 两级目录 -->
+    <view class="card toc" wx:if="{{toc.length}}">
+      <view class="toc-title">目录</view>
+      <block wx:for="{{toc}}" wx:key="anchor">
+        <view
+          class="toc-item"
+          data-anchor="{{item.anchor}}"
+          bindtap="onTocTap"
+        >{{item.name}}</view>
+        <view
+          class="toc-item toc-lv2"
+          wx:for="{{item.children}}"
+          wx:for-item="c"
+          wx:key="anchor"
+          data-anchor="{{c.anchor}}"
+          bindtap="onTocTap"
+        >{{c.name}}</view>
+      </block>
+    </view>
+
+    <!-- 正文 -->
+    <view class="card article" style="font-size:{{fontSize}}px;">
+      <block wx:for="{{blocks}}" wx:key="idx">
+        <view wx:if="{{item.type === 'h2'}}" class="a-h2" id="sec{{item.idx}}">{{item.text}}</view>
+        <view wx:elif="{{item.type === 'h3'}}" class="a-h3" id="sec{{item.idx}}">{{item.text}}</view>
+        <view
+          wx:elif="{{item.type === 'clause'}}"
+          class="a-clause {{item.hasMark ? 'a-marked' : ''}}"
+          id="sec{{item.idx}}"
+          data-idx="{{item.idx}}"
+          bindtap="onBlockTap"
+        >
+          <text class="a-no" selectable="{{true}}">{{item.no}}</text>
+          <text class="a-txt" selectable="{{true}}">{{item.text}}</text>
+        </view>
+        <view
+          wx:elif="{{item.type === 'item'}}"
+          class="a-item {{item.hasMark ? 'a-marked' : ''}}"
+          id="sec{{item.idx}}"
+          data-idx="{{item.idx}}"
+          bindtap="onBlockTap"
+        >
+          <text class="a-no" selectable="{{true}}">{{item.no}}</text>
+          <text class="a-txt" selectable="{{true}}">{{item.text}}</text>
+        </view>
+        <view
+          wx:elif="{{item.type === 'note'}}"
+          class="a-note {{item.hasMark ? 'a-marked' : ''}}"
+          id="sec{{item.idx}}"
+          data-idx="{{item.idx}}"
+          bindtap="onBlockTap"
+        >
+          <text selectable="{{true}}">{{item.text}}</text>
+        </view>
+        <view
+          wx:else
+          class="a-p {{item.hasMark ? 'a-marked' : ''}}"
+          id="sec{{item.idx}}"
+          data-idx="{{item.idx}}"
+          bindtap="onBlockTap"
+        >
+          <text selectable="{{true}}">{{item.text}}</text>
+        </view>
+      </block>
+    </view>
+
+    <view class="tip">提示：点击正文中的任意段落即可为该段添加批注。</view>
+
+    <!-- 查看原文 -->
+    <view class="btn btn-block" wx:if="{{doc.url}}" bindtap="openSource">查看原文链接</view>
+
+  </block>
+
+  <!-- 底部操作条（详情页不是 tabBar 页，底部只有这一条） -->
+  <view class="actionbar">
+    <view class="ab-btn {{isFav ? 'ab-on' : ''}}" bindtap="toggleFav">
+      <image class="ab-icon" src="{{isFav ? '/images/ic-star-fill.png' : '/images/ic-star.png'}}" mode="aspectFit" />
+      <text class="ab-txt">{{isFav ? '已收藏' : '收藏'}}</text>
+    </view>
+    <view class="ab-btn" bindtap="openMarkList">
+      <image class="ab-icon" src="/images/ic-pen.png" mode="aspectFit" />
+      <text class="ab-txt">批注 {{markCount}}</text>
+    </view>
+    <view class="ab-btn" bindtap="openExport">
+      <image class="ab-icon" src="/images/ic-download.png" mode="aspectFit" />
+      <text class="ab-txt">导出</text>
+    </view>
+    <view class="ab-btn" bindtap="cycleFont">
+      <text class="ab-aa">Aa</text>
+      <text class="ab-txt">{{fontSize}}px</text>
+    </view>
+  </view>
+
+  <!-- 批注弹层 -->
+  <view class="sheet-mask" wx:if="{{showMarkSheet}}" bindtap="closeSheet"></view>
+  <view class="sheet" wx:if="{{showMarkSheet}}">
+    <view class="sheet-title">{{sheetTitle}}</view>
+    <view class="sheet-sub">{{sheetSub}}</view>
+
+    <!-- 段落模式：被选中段落的原文 + 该段已有批注 -->
+    <view class="sheet-field" wx:if="{{sheetMode === 'block'}}">
+      <view class="quote">{{markTarget.text}}</view>
+      <view class="note-item color-{{item.color}}" wx:for="{{blockMarks}}" wx:key="id">
+        <view class="note-quote">{{item.noteText}}</view>
+        <view class="note-doc">{{item.timeText}}</view>
+        <view class="sheet-actions">
+          <view class="btn btn-sm" data-id="{{item.id}}" bindtap="editMark">编辑</view>
+          <view class="btn btn-danger btn-sm" data-id="{{item.id}}" bindtap="deleteMark">删除</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 列表模式：整篇批注 -->
+    <view class="sheet-field" wx:if="{{sheetMode === 'list'}}">
+      <view class="note-item color-{{item.color}}" wx:for="{{docMarks}}" wx:key="id" data-id="{{item.id}}" bindtap="jumpMark">
+        <view class="note-quote">{{item.excerpt}}</view>
+        <view class="note-text" wx:if="{{item.note}}">{{item.note}}</view>
+        <view class="note-doc">{{item.timeText}}</view>
+        <view class="sheet-actions">
+          <view class="btn btn-sm" data-id="{{item.id}}" bindtap="editMark">编辑</view>
+          <view class="btn btn-danger btn-sm" data-id="{{item.id}}" bindtap="deleteMark">删除</view>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{!docMarks.length}}">
+        <view class="empty-title">还没有批注</view>
+        <view class="empty-sub">在正文里点一段，就能在该段上添加批注</view>
+      </view>
+    </view>
+
+    <!-- 批注表单 -->
+    <view class="sheet-field" wx:if="{{sheetMode === 'block' || editingMarkId}}">
+      <view class="sheet-label">{{editingMarkId ? '修改批注' : '批注内容'}}</view>
+      <textarea
+        class="sheet-textarea"
+        value="{{markDraft}}"
+        placeholder="写点批注…"
+        bindinput="onMarkInput"
+        auto-height
+      ></textarea>
+      <view class="sheet-label" style="margin-top:12px;">标记颜色</view>
+      <view class="color-picker">
+        <view class="color-dot color-yellow {{markColor === 'yellow' ? 'on' : ''}}" data-color="yellow" bindtap="onColorTap"></view>
+        <view class="color-dot color-green {{markColor === 'green' ? 'on' : ''}}" data-color="green" bindtap="onColorTap"></view>
+        <view class="color-dot color-blue {{markColor === 'blue' ? 'on' : ''}}" data-color="blue" bindtap="onColorTap"></view>
+        <view class="color-dot color-pink {{markColor === 'pink' ? 'on' : ''}}" data-color="pink" bindtap="onColorTap"></view>
+      </view>
+    </view>
+
+    <view class="sheet-actions">
+      <view class="btn" bindtap="closeSheet">取消</view>
+      <view class="btn btn-primary" bindtap="saveMark">{{editingMarkId ? '更新' : '保存'}}</view>
+    </view>
+  </view>
+
+  <!-- 导出弹层 -->
+  <view class="sheet-mask" wx:if="{{showExport}}" bindtap="closeExport"></view>
+  <view class="sheet" wx:if="{{showExport}}">
+    <view class="sheet-title">导出本篇</view>
+    <view class="sheet-sub">{{doc.title}}</view>
+    <view class="sheet-row" wx:for="{{formats}}" wx:key="id" data-fmt="{{item.id}}" bindtap="onExport">
+      <view class="sr-wrap">
+        <view class="sr-label">{{item.name}}</view>
+        <view class="sr-desc">{{item.desc}}</view>
+      </view>
+      <image class="sr-arrow" src="/images/ic-chevron.png" mode="aspectFit" />
+    </view>
+    <view class="tip">导出后会写入小程序本地目录，可复制全文或分享文件。</view>
+  </view>
+
+</view>

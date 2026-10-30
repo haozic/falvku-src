@@ -1,0 +1,73 @@
+<view class="root {{themeClass}}">
+
+  <!-- 检索框 -->
+  <view class="searchbar sbar">
+    <input
+      class="sb-input"
+      value="{{query}}"
+      placeholder="检索法规标题、条文、发布机关…"
+      confirm-type="search"
+      bindinput="onInput"
+      bindconfirm="onSearch"></input>
+    <view class="sb-btn" bindtap="onSearch">检索</view>
+  </view>
+
+  <view class="hint">支持语法：「短语」精确匹配、-排除词、标题:字段限定</view>
+
+  <!-- 门类筛选 -->
+  <scroll-view class="chips chips-scroll" scroll-x="true">
+    <view class="chip {{activeCat === 'all' ? 'chip-on' : ''}}" data-id="all" bindtap="onCatTap">全部门类</view>
+    <view
+      class="chip {{activeCat === item.id ? 'chip-on' : ''}}"
+      wx:for="{{cats}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onCatTap"
+    >{{item.name}} {{item.count}}</view>
+  </scroll-view>
+
+  <!-- 排序 -->
+  <view class="toolbar">
+    <view class="sorts">
+      <view class="sort {{sort === 'relevance' ? 'sort-on' : ''}}" data-s="relevance" bindtap="onSortTap">相关度</view>
+      <view class="sort {{sort === 'new' ? 'sort-on' : ''}}" data-s="new" bindtap="onSortTap">最新</view>
+      <view class="sort {{sort === 'old' ? 'sort-on' : ''}}" data-s="old" bindtap="onSortTap">最早</view>
+      <view class="sort {{sort === 'title' ? 'sort-on' : ''}}" data-s="title" bindtap="onSortTap">标题</view>
+    </view>
+    <text class="count">{{countText}}</text>
+  </view>
+
+  <!-- 结果 -->
+  <view class="doc-list">
+    <view
+      class="doc-item"
+      wx:for="{{results}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onDocTap"
+    >
+      <view class="doc-title">{{item.title}}</view>
+      <view class="doc-meta">
+        <text class="badge badge-accent">{{item.catName}}</text>
+        <text class="meta-txt" wx:if="{{item.published}}">{{item.publishedText}}</text>
+        <text class="meta-txt" wx:if="{{item.issuer}}">{{item.issuer}}</text>
+        <text class="meta-txt" wx:if="{{item.chars}}">{{item.charsText}}</text>
+      </view>
+      <rich-text class="doc-snip" nodes="{{item.snippetHtml}}"></rich-text>
+    </view>
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{loading}}">检索中…</view>
+  <view class="load-more" wx:elif="{{loadingMore}}">加载中…</view>
+  <view class="load-more" wx:elif="{{hasMore}}" bindtap="loadMore">加载更多</view>
+  <view class="load-more" wx:elif="{{results.length}}">— 已经到底了 —</view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:if="{{!loading && !loadingMore && !results.length}}">
+    <image src="/images/ic-search.png" mode="aspectFit" />
+    <view class="empty-title">没有找到匹配的法规</view>
+    <view class="empty-sub">换个关键词，或调整门类筛选</view>
+  </view>
+
+</view>

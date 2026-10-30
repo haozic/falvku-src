@@ -1,0 +1,104 @@
+<view class="root {{themeClass}}">
+
+  <!-- 检索入口 -->
+  <view class="section">
+    <view class="card">
+      <view class="hero-title">法规速查</view>
+      <view class="hero-desc">共 {{total}} 部法规 · {{totalCharsText}}，覆盖党内法规与国家法律法规</view>
+      <view class="searchbar">
+        <input
+          class="sb-input"
+          value="{{query}}"
+          placeholder="检索党章党规、法律法规条文…"
+          confirm-type="search"
+          bindinput="onInput"
+          bindconfirm="onSearch"></input>
+        <view class="sb-btn" bindtap="onSearch">检索</view>
+      </view>
+      <view class="hero-hint">支持语法：「短语」精确匹配、-排除词、标题:字段限定</view>
+    </view>
+  </view>
+
+  <!-- 加载失败 -->
+  <view class="section" wx:if="{{error}}">
+    <view class="card">
+      <view class="empty">
+        <image src="/images/ic-none.png" mode="aspectFit" />
+        <view class="empty-title">无法连接后端服务</view>
+        <view class="empty-sub">{{error}}</view>
+        <view class="btn btn-primary btn-sm" style="margin-top:16px;" bindtap="load">重试</view>
+      </view>
+    </view>
+  </view>
+
+  <block wx:if="{{!error}}">
+    <!-- 门类速览 -->
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">门类速览</text>
+        <text class="section-more">共 {{cats.length}} 个门类</text>
+      </view>
+      <view class="cat-grid">
+        <view
+          class="cat-tile tone-{{item.tone}}"
+          wx:for="{{cats}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="onCatTap"
+        >
+          <view class="ct-dot"></view>
+          <view class="ct-name">{{item.name}}</view>
+          <view class="ct-count">{{item.count}} 部</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 法规体系 -->
+    <view class="section">
+      <view class="section-head">
+        <text class="section-title">法规体系</text>
+      </view>
+      <view class="group-block" wx:for="{{groups}}" wx:key="id">
+        <view class="group-head">
+          <view class="group-dot" style="background:{{item.color}}"></view>
+          <text class="group-name">{{item.name}}</text>
+          <text class="group-count">{{item.total}} 部</text>
+        </view>
+        <view class="section-desc group-desc">{{item.desc}}</view>
+        <view class="chips">
+          <view
+            class="chip"
+            wx:for="{{item.cats}}"
+            wx:for-item="c"
+            wx:key="id"
+            data-id="{{c.id}}"
+            bindtap="onCatTap"
+          >{{c.name}} {{c.count}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 最近浏览 -->
+    <view class="section" wx:if="{{recent.length}}">
+      <view class="section-head">
+        <text class="section-title">最近浏览</text>
+        <text class="section-more" bindtap="goMine">我的 ›</text>
+      </view>
+      <view
+        class="doc-item"
+        wx:for="{{recent}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onDocTap"
+      >
+        <view class="doc-title">{{item.title}}</view>
+        <view class="doc-meta">
+          <text class="badge badge-accent">{{item.catName}}</text>
+          <text class="meta-txt" wx:if="{{item.published}}">{{item.publishedText}}</text>
+          <text class="meta-txt" wx:if="{{item.issuer}}">{{item.issuer}}</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+</view>

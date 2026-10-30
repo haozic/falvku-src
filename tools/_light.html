@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<base href="/">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="离线可用的中文法规检索库：党内法规（党章、准则、条例、规定、办法、规则、细则、组工文件、党务知识）与国家法律法规（宪法、法律、行政法规、监察法规），支持全文检索、收藏、自建条目与多格式导出。">
+<title>法律法规库 · 党内法规与国家法律法规检索平台</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23c8102e'/%3E%3Cpath d='M16 10.2c-2.1-1.7-4.6-2.4-7.4-2.4H7v17.4h1.6c2.8 0 5.3.7 7.4 2.4 2.1-1.7 4.6-2.4 7.4-2.4H25V7.8h-1.6c-2.8 0-5.3.7-7.4 2.4z' fill='%23ffd166'/%3E%3Cpath d='M16 10.2v17.4' stroke='%23c8102e' stroke-width='1.3'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/style.css?v=20261028j">
+<link rel="preload" as="image" href="assets/img/flk-head-bg.jpg">
+<script>
+/* 首屏前应用主题，避免深色模式闪烁 */
+(function(){try{var s=JSON.parse(localStorage.getItem('fg.settings.v1')||'{}');if(s&&s.theme==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();
+</script>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============================ 顶栏 ============================ -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#/home" title="返回首页">
+        <img class="brand-logo" src="assets/img/flk-emblem.png" alt="" aria-hidden="true">
+        <span class="brand-name">法律法规库</span>
+        <span class="brand-sep" aria-hidden="true"></span>
+        <span class="brand-sub">党内法规 · 国家法律法规</span>
+      </a>
+
+      <form class="searchbar" id="searchForm" autocomplete="off" role="search">
+        <span class="searchbar-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="17" height="17"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+        <input type="text" id="searchInput" class="searchbar-input" placeholder="检索法规标题、条文、发布机关…" aria-label="法规检索">
+        <button type="button" class="searchbar-clear" id="searchClear" title="清空" hidden>×</button>
+        <button type="submit" class="searchbar-btn" title="检索">检索</button>
+        <div class="suggest" id="suggest" hidden></div>
+      </form>
+
+      <nav class="topbar-actions">
+        <button class="icon-btn" id="themeBtn" title="切换深色 / 浅色模式" aria-label="切换主题">
+          <svg class="ico-sun" viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <svg class="ico-moon" viewBox="0 0 24 24" width="18" height="18"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        </button>
+        <a class="btn btn-primary btn-sm" href="#/add"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5.2v13.6M5.2 12h13.6"/></svg>新增条目</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============================ 主体 ============================ -->
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <nav class="side-nav">
+        <div class="side-group">
+          <div class="side-title">检索</div>
+          <a class="side-link" href="#/search"><span class="sl-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></span>全库检索</a>
+          <a class="side-link" href="#/browse"><span class="sl-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg></span>分类浏览</a>
+          <a class="side-link" href="#/timeline"><span class="sl-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.4"/><path d="M12 7.2V12l3.2 2.1"/></svg></span>立法时间轴</a>
+        </div>
+        <div class="side-group">
+          <div class="side-title">我的</div>
+          <a class="side-link" href="#/favorites"><span class="sl-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.9l2.6 5.3 5.8.85-4.2 4.1 1 5.8L12 17.3l-5.2 2.65 1-5.8-4.2-4.1 5.8-.85L12 3.9z"/></svg></span>我的收藏<span class="sl-count" id="favCountSide">0</span></a>
+          <a class="side-link" href="#/custom"><span class="sl-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 19.5h15"/><path d="M13.2 4.8l6 6L9.4 20.6l-6 1 1-6 8.8-10.8z"/></svg></span>自建条目<span class="sl-count" id="customCountSide">0</span></a>
+        </div>
+        <div class="side-group">
+          <div class="side-title">法规体系</div>
+          <div class="side-cats" id="sideCats"></div>
+        </div>
+      </nav>
+      <div class="side-foot">
+        <div class="side-foot-line">内容来源：国家法律法规数据库 · 人民网党建频道 · 湖北法规库</div>
+        <div class="side-foot-line" id="buildInfo">本地离线可用 · 数据随页面内置</div>
+      </div>
+    </aside>
+
+    <main class="view" id="view" tabindex="-1"></main>
+  </div>
+
+  <button class="side-toggle" id="sideToggle" aria-label="展开菜单">☰</button>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+
+<!-- ============================ 弹层 ============================ -->
+<div class="modal-root" id="modalRoot" hidden>
+  <div class="modal-mask" data-close="1"></div>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <header class="modal-head">
+      <h3 id="modalTitle">标题</h3>
+      <button class="icon-btn" data-close="1" aria-label="关闭">✕</button>
+    </header>
+    <div class="modal-body" id="modalBody"></div>
+    <footer class="modal-foot" id="modalFoot"></footer>
+  </div>
+</div>
+
+<div class="toast-root" id="toastRoot" aria-live="polite"></div>
+
+<noscript>
+  <div style="padding:40px;text-align:center;font-family:sans-serif">本工具需要启用 JavaScript 才能运行。</div>
+</noscript>
+
+<script src="data/regulations.js?v=20261028j"></script>
+<!-- FLK-CHUNKS:BEGIN -->
+<script src="data/flk_01.js?v=20261028j"></script>
+<script src="data/flk_02.js?v=20261028j"></script>
+<script src="data/flk_03.js?v=20261028j"></script>
+<script src="data/flk_04.js?v=20261028j"></script>
+<script src="data/flk_05.js?v=20261028j"></script>
+<script src="data/flk_06.js?v=20261028j"></script>
+<script src="data/flk_07.js?v=20261028j"></script>
+<script src="data/flk_08.js?v=20261028j"></script>
+<script src="data/flk_09.js?v=20261028j"></script>
+<!-- FLK-CHUNKS:END -->
+<!-- HUBEI-CHUNKS:BEGIN -->
+<script src="data/hubei_01.js?v=20261028j"></script>
+<script src="data/hubei_02.js?v=20261028j"></script>
+<script src="data/hubei_03.js?v=20261028j"></script>
+<!-- HUBEI-CHUNKS:END -->
+<script src="assets/js/store.js?v=20261028j"></script>
+<script src="assets/js/search.js?v=20261028j"></script>
+<script src="assets/js/exporter.js?v=20261028j"></script>
+<script src="assets/js/markdown.js?v=20261028j"></script>
+<script src="assets/js/app.js?v=20261028j"></script>
+<script>(function(){var t='light';function force(){document.documentElement.setAttribute("data-theme",t);}force();document.addEventListener("DOMContentLoaded",function(){force();setTimeout(force,0);});window.addEventListener("load",function(){force();setTimeout(force,300);setTimeout(force,1200);});})();</script>
+</body>
+</html>

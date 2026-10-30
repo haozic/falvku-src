@@ -1,0 +1,18 @@
+/* 我的收藏页 */
+
+.di-top {
+  padding-bottom: 10px;
+}
+
+.di-actions {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.di-time {
+  font-size: 12px;
+  color: var(--text-subtle);
+  margin-left: auto;
+}

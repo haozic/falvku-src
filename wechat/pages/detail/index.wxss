@@ -1,0 +1,258 @@
+/* 详情页 */
+
+/* 底部操作条是 fixed 的，正文要多留出空间，别被盖住 */
+.root {
+  padding-bottom: 96px;
+}
+
+.hero {
+  padding: 18px 16px;
+}
+
+.hero-title {
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.hero-tags {
+  margin-bottom: 12px;
+}
+
+.hero-tags .badge {
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+
+.meta-grid {
+  display: flex;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.meta-cell {
+  width: 50%;
+  display: flex;
+  font-size: 12px;
+  padding: 4px 8px 4px 0;
+  box-sizing: border-box;
+}
+
+.meta-cell .mk {
+  color: var(--text-subtle);
+  flex: none;
+  margin-right: 6px;
+}
+
+.meta-cell .mv {
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.summary {
+  margin-top: 10px;
+}
+
+.sum-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.sum-text {
+  display: block;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* 目录 */
+.toc {
+  margin-top: 10px;
+  padding: 12px 14px;
+}
+
+.toc-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.toc-item {
+  display: block;
+  padding: 5px 0 5px 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  border-left: 2px solid transparent;
+}
+
+.toc-lv2 {
+  padding-left: 20px;
+  font-size: 12px;
+}
+
+/* 正文 */
+.article {
+  margin-top: 10px;
+  padding: 18px 16px;
+  line-height: 1.95;
+  color: var(--text);
+}
+
+.a-h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 26px 0 10px;
+  padding-left: 10px;
+  border-left: 3px solid var(--accent);
+  line-height: 1.5;
+}
+
+.a-h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 20px 0 8px;
+  padding-left: 20px;
+  color: var(--text);
+}
+
+.a-clause,
+.a-item,
+.a-p {
+  margin-bottom: 10px;
+}
+
+.a-p {
+  text-indent: 2em;
+}
+
+.a-item {
+  padding-left: 2em;
+}
+
+.a-note {
+  text-indent: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  background: var(--surface-muted);
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.a-no {
+  font-weight: 700;
+  margin-right: 2px;
+}
+
+/* 有批注的段落：左侧标色 */
+.a-clause.a-marked,
+.a-item.a-marked,
+.a-p.a-marked,
+.a-note.a-marked {
+  border-left: 3px solid var(--hl-yellow);
+  padding-left: 8px;
+  background: var(--surface-muted);
+}
+
+.a-clause.a-marked .a-no {
+  color: var(--accent);
+}
+
+.tip {
+  font-size: 11px;
+  color: var(--text-subtle);
+  text-align: center;
+  padding: 14px 0 18px 0;
+}
+
+/* 底部操作条 */
+.actionbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 8px 12px 8px 12px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  display: flex;
+}
+
+.ab-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  padding: 2px 0;
+}
+
+.ab-icon {
+  width: 20px;
+  height: 20px;
+  margin-bottom: 3px;
+}
+
+.ab-aa {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  margin-bottom: 3px;
+}
+
+.ab-txt {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.ab-on {
+  color: var(--accent);
+}
+
+.ab-on .ab-txt {
+  color: var(--accent);
+}
+
+/* 弹层补充 */
+.quote {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  background: var(--surface-muted);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+
+.sr-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.sr-arrow {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  opacity: 0.5;
+}
+
+/* 骨架屏 */
+.skeleton {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  height: 84px;
+  margin-bottom: 10px;
+}

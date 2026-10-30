@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "name": "falv-mini-app",
+  "displayName": "法规库 · 党务速查",
+  "version": "1.0.0",
+  "description": "党务工作者的法规速查工具：收录党内法规与国家法律法规 2706 部，支持全文检索、分类浏览、两级目录、划线批注、收藏与多格式导出。语料常驻服务端，检索毫秒级返回。",
+  "author": "法规库项目组",
+  "icon": "icon.png",
+  "category": "Productivity",
+  "exampleQueries": [
+    "检索党内监督相关规定",
+    "查中国共产党章程全文",
+    "按门类浏览党内法规",
+    "看立法时间轴上近十年的法规"
+  ],
+  "apps": [],
+  "mcpServers": [],
+  "skills": []
+}

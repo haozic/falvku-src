@@ -1,0 +1,74 @@
+{
+  "description": "法规库 · 原生微信小程序（党内法规 / 国家法律法规 / 湖北地方法规 检索）",
+  "projectname": "falv-wechat",
+  "appid": "touristappid",
+  "compileType": "miniprogram",
+  "libVersion": "2.9.0",
+  "srcMiniprogramRoot": "./",
+  "miniprogramRoot": "./",
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": false,
+    "postcss": true,
+    "minified": true,
+    "newFeature": true,
+    "coverView": true,
+    "nodeModules": false,
+    "autoAudits": false,
+    "showShadowRootInWxmlPanel": true,
+    "scopeDataCheck": false,
+    "checkInvalidKey": true,
+    "checkSiteMap": true,
+    "uploadWithSourceMap": true,
+    "minifyWXSS": true,
+    "useCompilerPlugins": false,
+    "ignoreUploadUnusedFiles": true
+  },
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "首页",
+          "pathName": "pages/home/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "检索页（带查询词）",
+          "pathName": "pages/search/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "详情页",
+          "pathName": "pages/detail/index",
+          "query": "id=r0034",
+          "scene": null
+        },
+        {
+          "name": "法规体系",
+          "pathName": "pages/tree/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "立法时间轴",
+          "pathName": "pages/timeline/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "我的",
+          "pathName": "pages/mine/index",
+          "query": "",
+          "scene": null
+        }
+      ]
+    }
+  }
+}

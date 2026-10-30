@@ -1,0 +1,15 @@
+/* 我的笔记页 */
+
+.ng-card {
+  margin-bottom: 10px;
+}
+
+.ng-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}

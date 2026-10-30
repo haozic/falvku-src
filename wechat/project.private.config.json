@@ -1,0 +1,9 @@
+{
+  "projectname": "falv-wechat",
+  "setting": {
+    "compileHotReLoad": false,
+    "urlCheck": false,
+    "coverView": true
+  },
+  "condition": {}
+}

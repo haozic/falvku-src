@@ -1,0 +1,128 @@
+<view class="root {{themeClass}}">
+
+  <!-- 统计 -->
+  <view class="card stat-card">
+    <view class="stat">
+      <view class="stat-num">{{favCount}}</view>
+      <view class="stat-label">收藏</view>
+    </view>
+    <view class="stat">
+      <view class="stat-num">{{noteCount}}</view>
+      <view class="stat-label">批注</view>
+    </view>
+    <view class="stat">
+      <view class="stat-num">{{customCount}}</view>
+      <view class="stat-label">自建</view>
+    </view>
+    <view class="stat">
+      <view class="stat-num">{{recentCount}}</view>
+      <view class="stat-label">最近</view>
+    </view>
+  </view>
+
+  <!-- 功能入口 -->
+  <view class="card">
+    <view class="me-row" bindtap="goFavorites">
+      <image class="me-icon" src="/images/ic-star.png" mode="aspectFit" />
+      <text class="m-label">我的收藏</text>
+      <text class="m-count">{{favCount}}</text>
+      <image class="me-arrow" src="/images/ic-chevron.png" mode="aspectFit" />
+    </view>
+    <view class="me-row" bindtap="goNotes">
+      <image class="me-icon" src="/images/ic-pen.png" mode="aspectFit" />
+      <text class="m-label">我的笔记</text>
+      <text class="m-count">{{noteCount}}</text>
+      <image class="me-arrow" src="/images/ic-chevron.png" mode="aspectFit" />
+    </view>
+    <view class="me-row" bindtap="toggleCustom">
+      <image class="me-icon" src="/images/ic-plus.png" mode="aspectFit" />
+      <text class="m-label">自建条目</text>
+      <text class="m-count">{{customCount}}</text>
+      <image class="me-arrow {{showCustom ? 'open' : ''}}" src="/images/ic-chevron-down.png" mode="aspectFit" />
+    </view>
+  </view>
+
+  <!-- 自建条目 -->
+  <view class="card" wx:if="{{showCustom}}">
+    <view class="btn btn-primary btn-block" bindtap="newCustom">新增条目</view>
+    <view class="custom-item" wx:for="{{customs}}" wx:key="id">
+      <view class="ci-title">{{item.title}}</view>
+      <view class="ci-text" wx:if="{{item.excerpt}}">{{item.excerpt}}</view>
+      <view class="ci-actions">
+        <view class="btn btn-sm" data-id="{{item.id}}" bindtap="editCustom">编辑</view>
+        <view class="btn btn-danger btn-sm" data-id="{{item.id}}" bindtap="deleteCustom">删除</view>
+      </view>
+    </view>
+    <view class="empty" wx:if="{{!customs.length}}">
+      <image src="/images/ic-pen.png" mode="aspectFit" />
+      <view class="empty-title">还没有自建条目</view>
+      <view class="empty-sub">录入本机掌握的规定、笔记或学习材料</view>
+    </view>
+  </view>
+
+  <!-- 阅读设置 -->
+  <view class="card">
+    <view class="me-row">
+      <image class="me-icon" src="/images/ic-text.png" mode="aspectFit" />
+      <text class="m-label">正文字号</text>
+      <text class="m-count">{{fontSize}}px</text>
+      <view class="btn btn-sm" bindtap="cycleFont">切换</view>
+    </view>
+    <view class="me-row">
+      <image class="me-icon" src="/images/ic-moon.png" mode="aspectFit" />
+      <text class="m-label">深色模式</text>
+      <text class="m-count">{{themeLabel}}</text>
+      <switch checked="{{darkOn}}" color="#c8102e" bindchange="onDarkChange"></switch>
+    </view>
+    <view class="me-row" wx:if="{{themeMode !== 'auto'}}" bindtap="useSystemTheme">
+      <image class="me-icon" src="/images/ic-sun.png" mode="aspectFit" />
+      <text class="m-label">跟随系统</text>
+      <text class="m-count">恢复</text>
+    </view>
+    <view class="me-row" bindtap="clearRecent">
+      <image class="me-icon" src="/images/ic-trash.png" mode="aspectFit" />
+      <text class="m-label">清空最近浏览</text>
+      <text class="m-count">{{recentCount}}</text>
+    </view>
+  </view>
+
+  <!-- 最近浏览 -->
+  <view class="card" wx:if="{{recent.length}}">
+    <view class="card-title">最近浏览</view>
+    <view
+      class="me-row"
+      wx:for="{{recent}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onDocTap"
+    >
+      <text class="m-label">{{item.title}}</text>
+      <text class="m-count">{{item.catName}}</text>
+    </view>
+  </view>
+
+  <!-- 关于 -->
+  <view class="about">
+    <view>内容来源：国家法律法规数据库 · 人民网党建频道 · 共产党员网党章党规 · 湖北法规库</view>
+    <view style="margin-top:4px;">数据由本机后端服务提供，共 {{total}} 部法规</view>
+  </view>
+
+  <!-- 自建条目编辑弹层 -->
+  <view class="sheet-mask" wx:if="{{showEditSheet}}" bindtap="closeEditSheet"></view>
+  <view class="sheet" wx:if="{{showEditSheet}}">
+    <view class="sheet-title">{{editId ? '编辑条目' : '新增条目'}}</view>
+    <view class="sheet-field">
+      <view class="sheet-label">标题</view>
+      <input class="sheet-input" value="{{draftTitle}}" placeholder="条目标题" bindinput="onTitleInput"></input>
+    </view>
+    <view class="sheet-field">
+      <view class="sheet-label">正文</view>
+      <textarea class="sheet-textarea" value="{{draftText}}" placeholder="正文内容…" bindinput="onTextInput" auto-height></textarea>
+    </view>
+    <view class="sheet-actions">
+      <view class="btn" bindtap="closeEditSheet">取消</view>
+      <view class="btn btn-primary" bindtap="saveCustom">保存</view>
+    </view>
+  </view>
+
+</view>

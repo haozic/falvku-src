@@ -1,0 +1,58 @@
+<view class="root {{themeClass}}">
+
+  <view class="section-head">
+    <text class="section-title">立法时间轴</text>
+    <text class="section-more" wx:if="{{total}}">{{total}} 部</text>
+  </view>
+  <view class="desc">按公布年份倒序排列，{{years.length}} 个年份</view>
+
+  <view class="card" wx:if="{{loading}}">
+    <view class="skeleton"></view>
+    <view class="skeleton"></view>
+  </view>
+
+  <view class="card" wx:if="{{error}}">
+    <view class="empty">
+      <image src="/images/ic-none.png" mode="aspectFit" />
+      <view class="empty-title">时间轴加载失败</view>
+      <view class="empty-sub">{{error}}</view>
+    </view>
+  </view>
+
+  <view class="tl-year" wx:for="{{renderYears}}" wx:key="year">
+    <view class="tl-rail">
+      <view class="tl-dot"></view>
+    </view>
+    <view class="tl-content">
+      <view class="tl-y">
+        <text>{{item.year}}</text>
+        <text class="tl-count">{{item.count}} 部</text>
+      </view>
+
+      <view
+        class="tl-item"
+        wx:for="{{item.items}}"
+        wx:for-item="it"
+        wx:key="id"
+        data-id="{{it.id}}"
+        bindtap="onDocTap"
+      >
+        <view class="tl-title">{{it.title}}</view>
+        <view class="tl-meta">
+          <text class="badge badge-accent">{{it.catName}}</text>
+          <text class="meta-txt" wx:if="{{it.published}}">{{it.publishedText}}</text>
+          <text class="meta-txt" wx:if="{{it.issuer}}">{{it.issuer}}</text>
+        </view>
+      </view>
+
+      <view class="tl-more" wx:if="{{item.more}}" data-year="{{item.year}}" bindtap="onExpandYear">
+        展开本年全部 {{item.total}} 部 ›
+      </view>
+    </view>
+  </view>
+
+  <view class="load-more" wx:if="{{loading}}">加载中…</view>
+  <view class="load-more" wx:elif="{{hasMoreYears}}" bindtap="loadMoreYears">加载更多年份</view>
+  <view class="load-more" wx:elif="{{renderYears.length}}">— 已经到底了 —</view>
+
+</view>

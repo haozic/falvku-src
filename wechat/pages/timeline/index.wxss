@@ -1,0 +1,109 @@
+/* 立法时间轴页 */
+
+.desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.tl-year {
+  display: flex;
+}
+
+.tl-rail {
+  width: 14px;
+  flex: none;
+  position: relative;
+}
+
+.tl-rail::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+
+.tl-dot {
+  position: absolute;
+  left: 0;
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+  box-sizing: border-box;
+}
+
+.tl-content {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 18px;
+  padding-left: 10px;
+}
+
+.tl-y {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.tl-count {
+  font-size: 12px;
+  color: var(--text-subtle);
+  font-weight: 400;
+  margin-left: 6px;
+}
+
+.tl-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+}
+
+.tl-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 5px;
+}
+
+.tl-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.tl-meta .badge {
+  margin-right: 6px;
+  margin-bottom: 4px;
+}
+
+.tl-more {
+  font-size: 12px;
+  color: var(--accent);
+  padding: 6px 0 2px 0;
+}
+
+.load-more {
+  text-align: center;
+  padding: 14px 0 6px 0;
+  color: var(--text-subtle);
+  font-size: 13px;
+}
+
+.skeleton {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  height: 84px;
+  margin-bottom: 10px;
+}

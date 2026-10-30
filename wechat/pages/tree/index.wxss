@@ -1,0 +1,94 @@
+/* 法规体系页 */
+
+.desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.group {
+  margin-bottom: 10px;
+}
+
+.group-head {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.group-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+  flex: none;
+}
+
+.group-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.group-count {
+  font-size: 12px;
+  color: var(--text-subtle);
+  margin-left: auto;
+  margin-right: 8px;
+}
+
+.group-arrow {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  opacity: 0.5;
+  transform: rotate(-90deg);
+  transition: transform 0.18s ease;
+}
+
+.group-arrow.open {
+  transform: rotate(0deg);
+}
+
+.group-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-top: 4px;
+  margin-bottom: 6px;
+}
+
+.group-body {
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+.cat-row {
+  display: flex;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.cat-row:last-child {
+  border-bottom: 0;
+}
+
+.cr-name {
+  flex: 1;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.cr-count {
+  font-size: 12px;
+  color: var(--text-subtle);
+  margin-right: 8px;
+}
+
+.cr-arrow {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  opacity: 0.4;
+}

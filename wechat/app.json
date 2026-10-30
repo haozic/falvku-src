@@ -1,0 +1,63 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/search/index",
+    "pages/tree/index",
+    "pages/timeline/index",
+    "pages/mine/index",
+    "pages/detail/index",
+    "pages/favorites/index",
+    "pages/notes/index"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "法规库",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f4f5f7"
+  },
+  "tabBar": {
+    "color": "#5b6472",
+    "selectedColor": "#c8102e",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页",
+        "iconPath": "images/tab-home.png",
+        "selectedIconPath": "images/tab-home-active.png"
+      },
+      {
+        "pagePath": "pages/search/index",
+        "text": "检索",
+        "iconPath": "images/tab-search.png",
+        "selectedIconPath": "images/tab-search-active.png"
+      },
+      {
+        "pagePath": "pages/tree/index",
+        "text": "体系",
+        "iconPath": "images/tab-tree.png",
+        "selectedIconPath": "images/tab-tree-active.png"
+      },
+      {
+        "pagePath": "pages/timeline/index",
+        "text": "时间轴",
+        "iconPath": "images/tab-timeline.png",
+        "selectedIconPath": "images/tab-timeline-active.png"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的",
+        "iconPath": "images/tab-mine.png",
+        "selectedIconPath": "images/tab-mine-active.png"
+      }
+    ]
+  },
+  "darkmode": true,
+  "themeLocation": "theme.json",
+  "sitemapLocation": "sitemap.json",
+  "networkTimeout": {
+    "request": 20000
+  }
+}

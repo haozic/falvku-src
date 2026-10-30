@@ -1,0 +1,50 @@
+# ============================================================
+# 法规库 · 源码仓库忽略清单
+#
+# 原则：**产物不入库，源码入库**。
+#   - data/            入库（站点构建输入，43.5MB）
+#   - miniapps/*/miniapp/node/corpus/*.json.gz  入库（边缘检索语料，11.3MB）
+#   - dist/            不入库（构建输出，每次重建）
+#   - .publish/        不入库（里面是发布用的独立 git 仓库，不能嵌套）
+#   - tools/ 下的爬虫缓存、Chrome 配置、截图  不入库（300MB+，本地工作数据）
+# ============================================================
+
+# ---- 构建输出与发布目录 ----
+dist/
+.publish/
+
+# ---- 爬虫缓存与本地工作数据（可由 tools/ 下的抓取脚本重新生成）----
+tools/__pycache__/
+tools/_flkraw/
+tools/12371_cache/
+tools/cache/
+tools/chrome-profile/
+tools/chrome-profile-st/
+tools/flk_cache/
+tools/hubei_cache/
+tools/shots/
+tools/poc/
+tools/*.docx
+tools/*.doc
+
+# 中间语料（由 tools/build_miniapp_corpus.mjs 从 data/ 重建）
+tools/miniapp_corpus.json
+tools/flk_corpus.json
+tools/hubei_corpus.json
+tools/raw_corpus.json
+tools/bookdata.json
+tools/12371_meta.json
+tools/flk_meta.json
+tools/flk_items.json
+
+# ---- 系统与编辑器 ----
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+*.log
+
+# ---- Node ----
+node_modules/
+npm-debug.log*
