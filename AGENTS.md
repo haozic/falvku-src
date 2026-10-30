@@ -256,10 +256,16 @@ python tools\make_selftest.py
   （Chrome 84 才支持 flex gap），`inset: 0` 换成四边偏移；
   Grid 的 `gap` 可以留（Chrome 57 就支持）。
 - **推 GitHub 的坑**：git 凭据助手必须是
-  `!'C:/Program Files/GitHub CLI/gh.exe' auth git-credential`（**路径要带引号**，
-  少了引号 git 解析失败就会退回交互式弹窗，push 挂在那儿不动）；
-  `gh auth setup-git` 负责写这条配置。发布脚本里已设 `GIT_TERMINAL_PROMPT=0`，
-  凭据拿不到就直接报错而不是卡住。
+  `!'C:/Program Files/GitHub CLI/gh.exe' auth git-credential`
+  —— **必须以 `!` 开头**（告诉 git 这是 shell 命令，不是 helper 名）
+  **且路径两侧要有单引号**（路径里有空格）。
+  少了 `!`，git 会把 `credential-C:/Program Files/...` 当子命令去找，
+  报 `'credential-...' is not a git command`，然后回退到交互式弹窗；
+  少了引号，gh.exe 根本起不来。`gh auth setup-git` 负责写这条配置。
+  发布脚本里已设 `GIT_TERMINAL_PROMPT=0`，凭据拿不到就直接报错而不是卡住。
+  **验证要用 `node tools\probe_git_credential.mjs`**：它会先直调 gh.exe，
+  再走真实的 `git credential fill`（git 实际会走的路径）——
+  只测 gh.exe 会漏掉「配置写错但 gh 本身正常」这种情况。
 
 ### 第四种形态：Cloudflare Pages Functions（边缘检索）
 
