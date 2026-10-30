@@ -1,6 +1,7 @@
 const app = getApp();
 const api = require('../../utils/api.js');
 const util = require('../../utils/util.js');
+const store = require('../../utils/store.js');
 
 Page({
   data: {
@@ -125,6 +126,8 @@ Page({
       this.setData({ sort: 'new' });
     }
     app.globalData.lastQuery = q;
+    /* 记入本机检索历史：首页「最近检索」用 */
+    if (q) store.history.push(q);
 
     this.setData(append ? { loadingMore: true } : { loading: true, results: [] });
 

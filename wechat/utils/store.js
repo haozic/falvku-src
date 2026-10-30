@@ -23,7 +23,8 @@ const KEY = {
   marks: 'fg.marks.v1',
   recent: 'fg.recent.v1',
   settings: 'fg.settings.v1',
-  custom: 'fg.custom.v1'
+  custom: 'fg.custom.v1',
+  history: 'fg.history.v1'
 };
 
 function get(key, fallback) {
@@ -222,6 +223,29 @@ const Store = {
     },
     clear: function () {
       set(KEY.recent, []);
+    }
+  },
+
+  /* ---------------------------------------------------------- 检索历史 */
+
+  history: {
+    list: function () {
+      const v = get(KEY.history, []);
+      return Array.isArray(v) ? v : [];
+    },
+    /** 记一次检索（去重，最多 10 条） */
+    push: function (q) {
+      const s = String(q === undefined || q === null ? '' : q).trim();
+      if (!s) return;
+      const arr = Store.history.list().filter(function (x) { return x !== s; });
+      arr.unshift(s);
+      set(KEY.history, arr.slice(0, 10));
+    },
+    remove: function (q) {
+      set(KEY.history, Store.history.list().filter(function (x) { return x !== q; }));
+    },
+    clear: function () {
+      set(KEY.history, []);
     }
   },
 

@@ -22,6 +22,14 @@ function fmtNum(n) {
   return n + '字';
 }
 
+/** 字数 -> 只返回数字，单位交给标签显示。13266732 -> 1326.7
+ *  （统计条里数值太长会把相邻两格挤在一起，所以单位不放数值里） */
+function fmtWan(n) {
+  n = Number(n) || 0;
+  if (n >= 10000) return (n / 10000).toFixed(1).replace(/\.0$/, '');
+  return String(n);
+}
+
 /** 时间戳 -> 简短日期。2026-10-29 */
 function fmtDateShort(ts) {
   if (!ts) return '';
@@ -130,6 +138,7 @@ function exportName(fmt, stamp) {
 module.exports = {
   fmtDate: fmtDate,
   fmtNum: fmtNum,
+  fmtWan: fmtWan,
   fmtDateShort: fmtDateShort,
   debounce: debounce,
   throttle: throttle,

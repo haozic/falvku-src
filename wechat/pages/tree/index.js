@@ -15,10 +15,24 @@ Page({
 
   onShow: function () {
     this.setData({ themeClass: app.globalData.themeClass });
+    /* 首页体系卡片点进来时定位到该体系（其余收起），读完把标记清掉 */
+    const want = app.globalData.pendingGroup;
+    if (want) {
+      app.globalData.pendingGroup = '';
+      this.focusGroup(want);
+    }
   },
 
   onThemeChange: function (themeClass) {
     this.setData({ themeClass: themeClass });
+  },
+
+  /** 只展开指定体系，其余收起 */
+  focusGroup: function (id) {
+    const groups = this.data.groups.map(function (g) {
+      return Object.assign({}, g, { open: g.id === id });
+    });
+    this.setData({ groups: groups, allOpen: false });
   },
 
   load: function () {
@@ -50,6 +64,12 @@ Page({
         });
       }
       self.setData({ groups: groups, catCount: catCount, allOpen: true });
+      /* 首页体系卡片带过来的定位（数据这时才到齐） */
+      const want = app.globalData.pendingGroup;
+      if (want) {
+        app.globalData.pendingGroup = '';
+        self.focusGroup(want);
+      }
     });
   },
 

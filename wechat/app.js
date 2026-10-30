@@ -46,7 +46,9 @@ App({
     /* 检索页共享状态 */
     lastQuery: '',
     /* 从体系页跳转检索页时携带的门类 */
-    pendingCat: ''
+    pendingCat: '',
+    /* 首页体系卡片跳「体系」页时携带的体系 id */
+    pendingGroup: ''
   },
 
   onLaunch() {

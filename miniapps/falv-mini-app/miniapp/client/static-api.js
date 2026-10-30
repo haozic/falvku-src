@@ -479,6 +479,26 @@
       var parts = String(params.cat).split(',');
       for (var i = 0; i < parts.length; i++) if (parts[i]) cats.push(parts[i]);
     }
+    /* 体系过滤（与服务端一致）：服务端按「体系」筛 doc.group，
+       这里的引擎只认门类，所以把体系展开成门类集合再筛（取交集）。
+       注意：记录里的 group 字段是体系**名**（如「党内法规」），
+       groups[].id 才是体系 id（如 dangnei）——两种都接受。 */
+    if (params.group && params.group !== 'all') {
+      var gname = String(params.group);
+      var gcats = [];
+      var gs = (S.meta && S.meta.groups) || [];
+      for (var gi = 0; gi < gs.length; gi++) {
+        if (gs[gi].id !== gname && gs[gi].name !== gname) continue;
+        for (var gj = 0; gj < gs[gi].cats.length; gj++) {
+          if (gcats.indexOf(gs[gi].cats[gj]) === -1) gcats.push(gs[gi].cats[gj]);
+        }
+      }
+      if (cats.length) {
+        cats = cats.filter(function (c) { return gcats.indexOf(c) !== -1; });
+      } else {
+        cats = gcats;
+      }
+    }
     var sort = params.sort || 'relevance';
     var page = parseInt(params.page || '1', 10) || 1;
     var size = parseInt(params.size || '20', 10) || 20;

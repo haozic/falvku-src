@@ -1,7 +1,16 @@
 const app = getApp();
 const store = require('../../utils/store.js');
 const util = require('../../utils/util.js');
+const api = require('../../utils/api.js');
 
+/**
+ * 首页：只放「打开就能用」的东西，职责单一，不和 tabBar /「我的」页重复。
+ *   ① 检索卡   —— 全站唯一的搜索入口 + 库规模概览
+ *   ② 法规体系 —— 5 个体系的概览卡片；门类明细在「体系」页，这里不再列第二遍
+ *   ③ 最近检索 —— 本机检索历史
+ *   ④ 最新发布 —— 数据驱动（按公布日期倒序取 6 条），不硬编码法规 id
+ * 「最近浏览 / 收藏 / 笔记 / 自建」属于个人数据，统一放在「我的」页。
+ */
 Page({
   data: {
     themeClass: 'theme-light',
@@ -10,9 +19,11 @@ Page({
     error: '',
     total: 0,
     totalCharsText: '',
-    cats: [],
+    catCount: 0,
+    groupCount: 0,
     groups: [],
-    recent: []
+    history: [],
+    latest: []
   },
 
   onLoad: function () {
@@ -23,7 +34,7 @@ Page({
   onShow: function () {
     this.setData({
       themeClass: app.globalData.themeClass,
-      recent: this.pickRecent()
+      history: store.history.list()
     });
   },
 
@@ -31,21 +42,7 @@ Page({
     this.setData({ themeClass: themeClass });
   },
 
-  /** 最近浏览（带标题快照，最多 6 条） */
-  pickRecent: function () {
-    return store.recent.list().slice(0, 6).map(function (r) {
-      return {
-        id: r.id,
-        title: r.title || r.id,
-        catName: r.catName || '',
-        published: r.published || '',
-        publishedText: util.fmtDate(r.published),
-        issuer: r.issuer || ''
-      };
-    });
-  },
-
-  /** 拉门类 / 体系 / 统计 */
+  /** 拉体系 / 统计 */
   load: function () {
     const self = this;
     this.setData({ loading: true, error: '' });
@@ -57,41 +54,57 @@ Page({
         });
         return;
       }
-      const cats = [];
-      for (let i = 0; i < meta.categories.length; i++) {
-        const c = meta.categories[i];
-        const st = meta.stats[c.id];
-        if (!st || !st.count) continue;
-        cats.push({ id: c.id, name: c.name, tone: c.tone || '', count: st.count });
-      }
       const groups = [];
+      let catCount = 0;
       for (let i = 0; i < meta.groups.length; i++) {
         const g = meta.groups[i];
-        const gs = [];
+        const names = [];
         let total = 0;
         for (let j = 0; j < g.cats.length; j++) {
           const st = meta.stats[g.cats[j]];
           if (!st || !st.count) continue;
-          gs.push({ id: g.cats[j], name: st.name, count: st.count });
+          names.push(st.name);
           total += st.count;
+          catCount++;
         }
         if (!total) continue;
         groups.push({
           id: g.id,
           name: g.name,
           color: g.color || '#c8102e',
-          desc: g.desc || '',
           total: total,
-          cats: gs
+          catNames: names.join(' · ')
         });
       }
       self.setData({
         loading: false,
         total: meta.total,
-        totalCharsText: util.fmtNum(meta.totalChars),
-        cats: cats,
+        totalCharsText: util.fmtWan(meta.totalChars),
+        catCount: catCount,
+        groupCount: groups.length,
         groups: groups
       });
+      self.loadLatest();
+    });
+  },
+
+  /** 最新发布：按公布日期倒序取 6 条 */
+  loadLatest: function () {
+    const self = this;
+    api.search({ sort: 'new', page: 1, size: 6 }).then(function (res) {
+      const hits = (res && res.hits) || [];
+      self.setData({
+        latest: hits.map(function (h) {
+          return {
+            id: h.id,
+            title: h.title,
+            catName: h.catName || '',
+            publishedText: util.fmtDate(h.published)
+          };
+        })
+      });
+    }).catch(function () {
+      /* 拿不到就不显示这一块，不影响其它内容 */
     });
   },
 
@@ -107,12 +120,25 @@ Page({
     wx.switchTab({ url: '/pages/search/index' });
   },
 
-  /** 点门类：跳检索页并按门类过滤（分类浏览的入口） */
-  onCatTap: function (e) {
-    const id = e.currentTarget.dataset.id;
-    app.globalData.pendingCat = id;
-    app.globalData.lastQuery = '';
+  /** 点最近检索：直接用这个词检索 */
+  onHistoryTap: function (e) {
+    const q = e.currentTarget.dataset.q;
+    if (!q) return;
+    app.globalData.lastQuery = q;
+    app.globalData.pendingCat = '';
     wx.switchTab({ url: '/pages/search/index' });
+  },
+
+  clearHistory: function () {
+    store.history.clear();
+    this.setData({ history: [] });
+  },
+
+  /** 点体系：跳「体系」页并定位到该体系（门类明细在那一页看） */
+  onGroupTap: function (e) {
+    const id = e.currentTarget.dataset.id;
+    app.globalData.pendingGroup = id || '';
+    wx.switchTab({ url: '/pages/tree/index' });
   },
 
   onDocTap: function (e) {
@@ -122,5 +148,14 @@ Page({
 
   goMine: function () {
     wx.switchTab({ url: '/pages/mine/index' });
+  },
+
+  goTree: function () {
+    app.globalData.pendingGroup = '';
+    wx.switchTab({ url: '/pages/tree/index' });
+  },
+
+  goTimeline: function () {
+    wx.switchTab({ url: '/pages/timeline/index' });
   }
 });

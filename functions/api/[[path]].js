@@ -1306,5 +1306,3 @@ export async function onRequest(context) {
     });
   }
 }
-
-export default { onRequest };

@@ -192,10 +192,14 @@ python tools\make_selftest.py
 | `tools/measure_home.js` | 量首页几何：门类卡片宽度、底部色条宽度、统计卡与双栏宽度 |
 | `tools/measure_tl.js` | 量时间轴几何：轴线位置、圆点是否落在轴线上 |
 | `tools/shot_js.js` | 截「需要交互才出现」的状态（如展开的导出菜单）：`node tools\shot_js.js <名称> <url> <js>` |
-| `tools/eval_js.js` | 通用页面探针：`node tools\eval_js.js <url> <js表达式> [等待毫秒]`，在真实 Chrome 里执行表达式并打印结果，调试前端比插日志快 |
+| `tools/shot_mobile.js` | **移动端截图**：`node tools\shot_mobile.js <名称> <url> [宽=390] [高=844] [等待ms] [dark] [full]`。用 CDP `Emulation.setDeviceMetricsOverride` 量真实手机视口——`--window-size` 在 Windows 上会被钳到 504px，截出来是**裁切图**，看着像布局溢出其实是截图窗口被钳 |
+| `tools/eval_js.js` | 通用页面探针：`node tools\eval_js.js <url> <js表达式> [等待毫秒] [宽] [高]`，在真实 Chrome 里执行表达式并打印结果，调试前端比插日志快 |
 | `tools/verify_export_ui.js` | UI 级导出验证：真的去点详情页的「导出本篇」，确认 md / html 落盘 |
 | `tools/extract_flk_home.js` | 从 flk.npc.gov.cn 首页抓取国徽 / 横幅底图 / 页面水印（内联 SVG 与 data URI 都要扫） |
 | `tools/prep_images.py` | 把 flk 素材处理成本地资源：压尺寸、量化、底部渐隐成透明（原件留 `tools/_flkraw/`） |
+| `functions/api/[[path]].js` | **Cloudflare Pages Function**：第四套后端，边缘检索（详见下文） |
+| `tools/cloudflare_function_selftest.mjs` | 边缘函数自检（146 项断言）：与既有 Node 服务端逐条比对 |
+| `部署指南.md` | 面向使用者的部署手册：GitHub 同步 + Cloudflare Pages 逐步操作 |
 
 ## 并行产物：Mini App 与原生微信小程序
 
@@ -232,14 +236,22 @@ python tools\make_selftest.py
 有 `window.FGStaticAPI` 就走它，否则走服务端 fetch）。
 
 - **构建**：`node tools\build_static_site.mjs .` → `dist/falv-web/`
-  （index.html + app.css/app.js/static-api.js + search.js + `data/` 25 个分片，41.4MB）
+  （index.html + app.css/app.js/static-api.js + search.js + `data/` 25 个分片，41.4MB）。
+  **加 `--no-corpus` 可跳过边缘检索语料**（纯静态托管用不到那 11.3MB；
+  部署到 Cloudflare Pages 时**不能**加，边缘函数要从 `/corpus/*.json.gz` 取语料）。
 - **发布**：`node tools\publish_github_pages.mjs .` → 同步到 `.publish/falv-ku/` 再推 GitHub Pages。
   **`.publish/` 里才是 git 仓库**——`dist/` 是构建输出，`build_static_site.mjs` 每次会整个重建它。
-- **自检**：`node tools\static_site_selftest.mjs`（57 项断言）——
+- **自检**：`node tools\static_site_selftest.mjs`（65 项断言）——
   在 Node 里造最小浏览器环境加载 static-api.js，逐条打 `/api/*`，
   **断言静态版与服务端版结果一致**（例如「党内监督」两边都是 127 条）。
-- **代价（必须写进 README/说明里）**：首次发起**非空检索**要下载全部 24 个正文分片
-  （约 39MB，仅此一次，之后走浏览器缓存）；门类浏览与打开单篇只加载 1 片（约 1.8MB）。
+- **两段式检索（重要）**：`/api/search` **不再等正文分片下完**——
+  先用「标题/摘要/标签/发文机关」这些元信息出结果（毫秒级，零额外下载），
+  24 个正文分片在后台并行下载，每片到达就 `Search.refreshDoc()` 增量建索引，
+  **全部到齐后自动重查刷新**。客户端据此显示「正在补充全文命中」。
+  实测「党内监督」首屏 5ms 出 89 条，索引就绪后 127 条（与服务端一致）。
+- **代价（必须写进 README/说明里）**：首次发起**非空检索**仍要下载全部 24 个正文分片
+  （传输约 12MB，仅此一次，之后走浏览器缓存）；门类浏览与打开单篇只加载 1 片（约 1.8MB）。
+  **要彻底消掉这 12MB，只能用第四种形态（边缘检索）。**
 - **兼容性**：`app.css` 已按 Chrome 69 改写——**flex `gap` 全部换成子项 margin**
   （Chrome 84 才支持 flex gap），`inset: 0` 换成四边偏移；
   Grid 的 `gap` 可以留（Chrome 57 就支持）。
@@ -248,6 +260,54 @@ python tools\make_selftest.py
   少了引号 git 解析失败就会退回交互式弹窗，push 挂在那儿不动）；
   `gh auth setup-git` 负责写这条配置。发布脚本里已设 `GIT_TERMINAL_PROMPT=0`，
   凭据拿不到就直接报错而不是卡住。
+
+### 第四种形态：Cloudflare Pages Functions（边缘检索）
+
+`functions/api/[[path]].js` 是**第四套后端**：把同一套 `/api/*` 契约搬到 Cloudflare 边缘，
+**手机不再需要下载正文分片**（只下几十 KB 的检索结果）。
+
+- **语料来源**：`miniapps/falv-mini-app/miniapp/node/corpus/{meta,bodies}.json.gz`（11.3MB），
+  由 `tools/build_miniapp_corpus.mjs` 从 `data/` 可复现重建；
+  `build_static_site.mjs` 会把它们拷进 `dist/falv-web/corpus/`，
+  边缘函数用 **`env.ASSETS.fetch()`** 读，再用 `DecompressionStream('gzip')` 解压。
+- **内存策略（Workers 单实例上限 128MB，这是最关键的约束）**：
+  常驻只有 `meta.json`（解析后约 10MB）+ `bodies.json.gz` 的**压缩字节**（11.4MB）；
+  检索时**流式解压**，边解压边切元素、逐个算分算完即丢，**41MB 正文从不整体驻留**；
+  再加一层**预筛**（命中不了的元素连 `JSON.parse` 都不做）。
+  实测常驻约 24MB，窄查询 0.29s / 宽查询 0.45s / 单篇详情 0.20s。
+- **必须知道的前提**：**免费 Workers 套餐每次请求只有 10ms CPU**，
+  全库扫描要 0.3 秒以上 → 免费额度会被打爆，**边缘检索需要 Workers Paid（约 $5/月）**。
+  不想付钱就退回第三种形态（纯静态 + 两段式检索）。
+- **自检**：`node tools\cloudflare_function_selftest.mjs`（146 项断言）——
+  在 Node 里造假的 `env.ASSETS.fetch()`，把**同一份语料**喂给既有 `corpus.mjs` 作基准，
+  逐条比对 6 个 query + 7 个预筛压力用例的 `total` / `hits[].id` / `hits[].score` /
+  `snippetHtml`，以及 `/api/meta` `/api/doc` `/api/timeline` `/api/suggest` `/api/recs`
+  和 5 种导出（导出按**字节**比，`Response.text()` 会剥掉 CSV 的 BOM）。
+- **降级**：没有 ASSETS binding / 语料缺失 → HTTP 503 + `{error:'corpus_unavailable'}`
+  （绝不抛未捕获异常）；`/api/meta` `/api/recs` `/api/suggest` `/api/timeline`
+  只依赖 meta，**语料只有一半也能用**。
+- **部署**：`部署指南.md` 有面向使用者的逐步操作（Pages 控制台点哪里、
+  构建命令 `node tools/build_static_site.mjs .`、输出目录 `dist/falv-web`）。
+
+## 第四种形态之外：客户端首页的职责划分（改版后）
+
+Mini App 客户端与微信小程序首页**结构一致**，职责单一，不互相重复：
+
+| 区块 | 内容 | 为什么放这儿 |
+|---|---|---|
+| 检索卡 | 全站唯一搜索入口 + 库规模统计 | 「打开就能用」 |
+| 法规体系 | **5 个体系**的概览卡片（体系名 + 门类数 + 门类名一行） | 门类明细在「体系」页，**不在首页再列一遍** |
+| 最近检索 | 本机检索历史（`fg.history.v1`） | 党务工作者反复查同样的词 |
+| 最新发布 | 按公布日期倒序取 6 条（`/api/search?sort=new`） | 数据驱动，**不硬编码法规 id** |
+
+- **「最近浏览 / 收藏 / 笔记 / 自建」统一放在「我的」页**，首页不再重复。
+- 改版前门类在**三处**出现（首页门类磁贴 + 首页体系分组 + 底部「体系」tab），
+  现在只在「体系」tab 出现一次。
+- **统计条必须用 `grid-template-columns: repeat(4, minmax(0, 1fr))`**：
+  flex 布局下数值太长会把相邻两格挤在一起（`min-width:0` 不够，
+  还得给数值本身加 `white-space:nowrap; overflow:hidden; text-overflow:ellipsis`）。
+  单位放**标签**里（「1347.2」+「万字」），不要拼进数值。
+- 微信小程序 WXSS **不要用 CSS Grid**（老 WebView 支持不稳），一律 flex + 百分比宽度。
 
 ## 门类与分组
 

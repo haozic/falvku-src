@@ -1,10 +1,26 @@
 <view class="root {{themeClass}}">
 
-  <!-- 检索入口 -->
+  <!-- ① 检索卡 -->
   <view class="section">
     <view class="card">
-      <view class="hero-title">法规速查</view>
-      <view class="hero-desc">共 {{total}} 部法规 · {{totalCharsText}}，覆盖党内法规与国家法律法规</view>
+      <view class="stat-row">
+        <view class="stat-cell">
+          <view class="stat-num">{{total}}</view>
+          <view class="stat-label">部法规</view>
+        </view>
+        <view class="stat-cell">
+          <view class="stat-num">{{totalCharsText}}</view>
+          <view class="stat-label">万字</view>
+        </view>
+        <view class="stat-cell">
+          <view class="stat-num">{{catCount}}</view>
+          <view class="stat-label">个门类</view>
+        </view>
+        <view class="stat-cell">
+          <view class="stat-num">{{groupCount}}</view>
+          <view class="stat-label">个体系</view>
+        </view>
+      </view>
       <view class="searchbar">
         <input
           class="sb-input"
@@ -15,7 +31,6 @@
           bindconfirm="onSearch"></input>
         <view class="sb-btn" bindtap="onSearch">检索</view>
       </view>
-      <view class="hero-hint">支持语法：「短语」精确匹配、-排除词、标题:字段限定</view>
     </view>
   </view>
 
@@ -32,73 +47,70 @@
   </view>
 
   <block wx:if="{{!error}}">
-    <!-- 门类速览 -->
-    <view class="section">
-      <view class="section-head">
-        <text class="section-title">门类速览</text>
-        <text class="section-more">共 {{cats.length}} 个门类</text>
-      </view>
-      <view class="cat-grid">
-        <view
-          class="cat-tile tone-{{item.tone}}"
-          wx:for="{{cats}}"
-          wx:key="id"
-          data-id="{{item.id}}"
-          bindtap="onCatTap"
-        >
-          <view class="ct-dot"></view>
-          <view class="ct-name">{{item.name}}</view>
-          <view class="ct-count">{{item.count}} 部</view>
-        </view>
-      </view>
-    </view>
 
-    <!-- 法规体系 -->
+    <!-- ② 法规体系（体系级概览，门类明细去「体系」页看） -->
     <view class="section">
       <view class="section-head">
         <text class="section-title">法规体系</text>
+        <text class="section-more" bindtap="goTree">全部门类 ›</text>
       </view>
-      <view class="group-block" wx:for="{{groups}}" wx:key="id">
-        <view class="group-head">
-          <view class="group-dot" style="background:{{item.color}}"></view>
-          <text class="group-name">{{item.name}}</text>
-          <text class="group-count">{{item.total}} 部</text>
-        </view>
-        <view class="section-desc group-desc">{{item.desc}}</view>
-        <view class="chips">
-          <view
-            class="chip"
-            wx:for="{{item.cats}}"
-            wx:for-item="c"
-            wx:key="id"
-            data-id="{{c.id}}"
-            bindtap="onCatTap"
-          >{{c.name}} {{c.count}}</view>
+      <view class="sys-grid">
+        <view
+          class="sys-card"
+          wx:for="{{groups}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="onGroupTap"
+        >
+          <view class="sys-top">
+            <view class="sys-dot" style="background:{{item.color}}"></view>
+            <text class="sys-name">{{item.name}}</text>
+            <text class="sys-count">{{item.total}} 部</text>
+          </view>
+          <view class="sys-cats">{{item.catNames}}</view>
         </view>
       </view>
     </view>
 
-    <!-- 最近浏览 -->
-    <view class="section" wx:if="{{recent.length}}">
+    <!-- ③ 最近检索 -->
+    <view class="section" wx:if="{{history.length}}">
       <view class="section-head">
-        <text class="section-title">最近浏览</text>
-        <text class="section-more" bindtap="goMine">我的 ›</text>
+        <text class="section-title">最近检索</text>
+        <text class="section-more" bindtap="clearHistory">清空</text>
       </view>
-      <view
-        class="doc-item"
-        wx:for="{{recent}}"
-        wx:key="id"
-        data-id="{{item.id}}"
-        bindtap="onDocTap"
-      >
-        <view class="doc-title">{{item.title}}</view>
-        <view class="doc-meta">
-          <text class="badge badge-accent">{{item.catName}}</text>
-          <text class="meta-txt" wx:if="{{item.published}}">{{item.publishedText}}</text>
-          <text class="meta-txt" wx:if="{{item.issuer}}">{{item.issuer}}</text>
-        </view>
+      <view class="chips">
+        <view
+          class="chip"
+          wx:for="{{history}}"
+          wx:key="*this"
+          data-q="{{item}}"
+          bindtap="onHistoryTap"
+        >{{item}}</view>
       </view>
     </view>
+
+    <!-- ④ 最新发布 -->
+    <view class="section" wx:if="{{latest.length}}">
+      <view class="section-head">
+        <text class="section-title">最新发布</text>
+        <text class="section-more" bindtap="goTimeline">时间轴 ›</text>
+      </view>
+      <view class="doc-list">
+        <view
+          class="doc-item"
+          wx:for="{{latest}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="onDocTap"
+        >
+          <view class="doc-title">{{item.title}}</view>
+          <view class="doc-meta">
+            <text class="badge badge-accent">{{item.catName}}</text>
+            <text class="meta-txt" wx:if="{{item.publishedText}}">{{item.publishedText}}</text>
+          </view>
+        </view>
+      </view>    </view>
+
   </block>
 
 </view>

@@ -127,6 +127,13 @@ console.log('\n=== 2. GET /api/search ===');
   /* 门类过滤 / 排序 / 分页 */
   const byCat = await API.request('/api/search', { cat: 'falv', sort: 'new', page: 1, size: 5 });
   check(byCat.hits.length === 5 && byCat.hits.every((x) => x.cat === 'falv'), 'cat 过滤生效');
+  /* 体系过滤（服务端也支持，静态版原先漏了，这里补齐并锁死） */
+  const byGroup = await API.request('/api/search', { group: '党内法规', size: 100 });
+  check(byGroup.hits.length > 0 && byGroup.hits.every((x) => x.group === '党内法规'), 'group 过滤生效');
+  const byGroupId = await API.request('/api/search', { group: 'dangnei', size: 100 });
+  check(byGroupId.total === byGroup.total, 'group 用 id 或用 name 结果一致');
+  const groupAll = await API.request('/api/search', { group: 'all', size: 5 });
+  check(groupAll.hits.length === 5, 'group=all 不过滤');
   const p2 = await API.request('/api/search', { q: '条例', page: 2, size: 5 });
   check(p2.page === 2, 'page 参数生效');
   const byTitle = await API.request('/api/search', { sort: 'title', size: 10 });
