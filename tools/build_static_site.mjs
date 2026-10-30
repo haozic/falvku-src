@@ -22,10 +22,18 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync
 import { join, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = process.argv[2] ? process.argv[process.argv.length - 1] : join(dirname(fileURLToPath(import.meta.url)), '..');
+/* 参数： [仓库根目录] [--no-corpus]
+   根目录取第一个非 -- 开头的参数（不能取最后一个，否则 --no-corpus 会被当成目录）。 */
+const argv = process.argv.slice(2);
+const rootArg = argv.find((a) => a.indexOf('--') !== 0);
+const root = rootArg ? join(process.cwd(), rootArg) : join(dirname(fileURLToPath(import.meta.url)), '..');
 const CLIENT = join(root, 'miniapps', 'falv-mini-app', 'miniapp', 'client');
 const OUT = join(root, 'dist', 'falv-web');
 const DATA_SRC = join(root, 'data');
+/* --no-corpus：不拷边缘检索语料。
+   纯静态托管（GitHub Pages）没有边缘函数，语料用不上，11.3MB 不必带上去；
+   部署到 Cloudflare Pages 时要带（functions/ 的边缘检索函数要从 env.ASSETS 读它）。 */
+const NO_CORPUS = process.argv.includes('--no-corpus');
 
 function say(msg) { console.log(msg); }
 
@@ -81,15 +89,16 @@ say('拷贝资源：客户端 ' + clientFiles.length + ' 个 + search.js + 数�
    没有这一层，边缘函数就只能靠纯静态托管（只能下全部正文）。 */
 const CORPUS_SRC = join(root, 'miniapps', 'falv-mini-app', 'miniapp', 'node', 'corpus');
 let corpusFiles = [];
-if (existsSync(CORPUS_SRC)) {
+if (!NO_CORPUS && existsSync(CORPUS_SRC)) {
   corpusFiles = readdirSync(CORPUS_SRC).filter((f) => /\.json\.gz$/.test(f));
   if (corpusFiles.length) {
     mkdirSync(join(OUT, 'corpus'), { recursive: true });
     for (const f of corpusFiles) copyFileSync(join(CORPUS_SRC, f), join(OUT, 'corpus', f));
   }
 }
-say('拷贝边缘检索语料：' + corpusFiles.length + ' 个（' +
-  (corpusFiles.reduce((n, f) => n + readFileSync(join(CORPUS_SRC, f)).length, 0) / 1024 / 1024).toFixed(1) + ' MB）');
+say('拷贝边缘检索语料：' + (NO_CORPUS ? '已跳过（--no-corpus）' :
+  corpusFiles.length + ' 个（' +
+  (corpusFiles.reduce((n, f) => n + readFileSync(join(CORPUS_SRC, f)).length, 0) / 1024 / 1024).toFixed(1) + ' MB）'));
 
 /* ------------------------------------------------------------ 生成 index.html */
 

@@ -418,7 +418,9 @@
     }
     function wan(n) {
       n = Number(n) || 0;
-      if (n >= 10000) return (n / 10000).toFixed(1).replace(/\.0$/, '') + ' 万';
+      /* 只返回数字，单位放在标签里（「1347.2」+「万字」），
+         否则数值太长会把相邻两格挤在一起 */
+      if (n >= 10000) return (n / 10000).toFixed(1).replace(/\.0$/, '');
       return String(n);
     }
     var catTotal = 0;
@@ -428,7 +430,7 @@
     var hero = el('section', { class: 'card' }, [
       el('div', { class: 'stat-row' }, [
         statCell(String(meta.total || 0), '部法规'),
-        statCell(wan(meta.totalChars), '字正文'),
+        statCell(wan(meta.totalChars), '万字'),
         statCell(String(catTotal), '个门类'),
         statCell(String(meta.groups.length), '个体系')
       ]),
@@ -486,6 +488,24 @@
         hbox
       ]));
     }
+
+    /* ---------- ④ 最新发布（数据驱动，不硬编码法规 id） ---------- */
+    var latestBox = el('div', { class: 'doc-list' });
+    var latestSection = el('section', { class: 'section' }, [
+      el('div', { class: 'section-head' }, [
+        el('span', { class: 'section-title', text: '最新发布' }),
+        el('a', { class: 'section-more', href: '#/timeline', text: '时间轴 ›' })
+      ]),
+      latestBox
+    ]);
+    view.appendChild(latestSection);
+    api('/api/search', { sort: 'new', page: 1, size: 6 }).then(function (res) {
+      latestBox.innerHTML = '';
+      (res.hits || []).forEach(function (r) { latestBox.appendChild(docCard(r)); });
+      if (!latestBox.children.length) latestSection.style.display = 'none';
+    }).catch(function () {
+      latestSection.style.display = 'none';
+    });
   }
 
   /* 收藏 / 笔记 / 最近浏览里的条目元信息。
@@ -1371,8 +1391,16 @@
     switch (r.name) {
       case 'home': viewHome(view); break;
       case 'search':
-        /* 首次进入检索页：拉一次全库（按最新排序），避免停在空结果态 */
-        if (!State.searchLoaded) {
+        /* #/search/关键词 —— 深链接直达（可分享、可外部跳转）。
+           注意 searchLoaded 要先置 true，否则 runSearch 完成后调 route() 会再触发一次，
+           形成无限循环。 */
+        if (r.param && !State.searchLoaded) {
+          State.lastQuery = r.param;
+          State.page = 1;
+          State.searchLoaded = true;
+          runSearch(r.param, 1);
+        } else if (!State.searchLoaded) {
+          /* 首次进入检索页：拉一次全库（按最新排序），避免停在空结果态 */
           State.searchLoaded = true;
           runSearch(State.lastQuery || '', 1);
         }

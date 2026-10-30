@@ -201,12 +201,12 @@ mark { background: #ffe58a; color: #4a3600; padding: 0 1px; border-radius: 2px; 
 
 /* 首页统计条 */
 .stat-row {
-  display: flex;
-  align-items: flex-end;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
   margin-bottom: 14px;
 }
 .stat-cell {
-  flex: 1 1 0;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -216,10 +216,16 @@ mark { background: #ffe58a; color: #4a3600; padding: 0 1px; border-radius: 2px; 
   font-weight: 600;
   line-height: 1.3;
   color: var(--mcode-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .stat-cell span {
   font-size: 11px;
   color: var(--mcode-text-subtle);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 体系概览卡片（首页）：只到体系一级，门类明细在「体系」页 */
@@ -228,6 +234,7 @@ mark { background: #ffe58a; color: #4a3600; padding: 0 1px; border-radius: 2px; 
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
 }
+.sys-grid > * { min-width: 0; }
 .sys-card {
   background: var(--mcode-surface);
   border: 1px solid var(--mcode-border);
